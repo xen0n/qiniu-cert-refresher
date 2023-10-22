@@ -18,6 +18,15 @@ const defaultHost = "https://api.qiniu.com"
 
 ///////////////////////////////////////////////////////////////////////////////
 
+func GetDomain(mac *auth.Credentials, domain string) (*Domain, error) {
+	var sb strings.Builder
+	sb.WriteString(defaultHost)
+	sb.WriteString("/domain/")
+	sb.WriteString(url.PathEscape(domain))
+
+	return common.RequestWithBody[*Domain](mac, sb.String(), nil)
+}
+
 func ListAllDomainsByCertID(mac *auth.Credentials, certID string) ([]*Domain, error) {
 	var result []*Domain
 
