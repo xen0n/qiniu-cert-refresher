@@ -13,9 +13,8 @@ import (
 
 func main() {
 	app := cli.App{
-		Name:   "qiniu-cert-refresher",
-		Usage:  "keeps Qiniu CDN synced with your locally-renewed certificates",
-		Before: beforeCmd,
+		Name:  "qiniu-cert-refresher",
+		Usage: "keeps Qiniu CDN synced with your locally-renewed certificates",
 		Flags: []cli.Flag{
 			&cli.PathFlag{
 				Name:    "config",
@@ -43,12 +42,14 @@ func main() {
 				Name:    "info",
 				Aliases: []string{"i"},
 				Usage:   "queries and shows the current state of configured accounts",
+				Before:  beforeCmd,
 				Action:  cmdInfo,
 			},
 			{
 				Name:    "upload",
 				Aliases: []string{"u"},
 				Usage:   "uploads a new certificate, refreshing all associated domains",
+				Before:  beforeCmd,
 				Action:  cmdUpload,
 				Flags: []cli.Flag{
 					&cli.PathFlag{
