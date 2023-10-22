@@ -5,12 +5,24 @@ package common
 import (
 	"bytes"
 	"encoding/json"
+	"fmt"
 	"io"
 	"log/slog"
 	"net/http"
 
 	"github.com/qiniu/go-sdk/v7/auth"
 )
+
+type RespError struct {
+	Code     int    `json:"code"`
+	ErrorMsg string `json:"error"`
+}
+
+var _ error = (*RespError)(nil)
+
+func (e *RespError) Error() string {
+	return fmt.Sprintf("Qiniu error %d: %s", e.Code, e.ErrorMsg)
+}
 
 // RequestWithBody 带body对api发出请求并且返回response body
 //
@@ -73,6 +85,16 @@ func RequestWithBody[Resp any](
 	}
 
 	slog.Debug("got HTTP response", "req", req, "statusCode", resp.StatusCode, "body", respBody)
+
+	if resp.StatusCode >= 400 {
+		// this is an error
+		var errObj RespError
+		err = json.Unmarshal(respBody, &errObj)
+		if err != nil {
+			return zeroResp, err
+		}
+		return zeroResp, &errObj
+	}
 
 	var result Resp
 	err = json.Unmarshal(respBody, &result)
