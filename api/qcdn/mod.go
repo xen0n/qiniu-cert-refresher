@@ -53,7 +53,7 @@ func listDomains(mac *auth.Credentials, req *ReqListDomains) (*RespListDomains, 
 		q.Add("types", string(t))
 	}
 	if len(req.CertID) > 0 {
-		q.Set("certid", req.CertID)
+		q.Set("certId", req.CertID)
 	}
 	if len(req.SourceTypes) > 0 {
 		q["sourceTypes"] = req.SourceTypes
