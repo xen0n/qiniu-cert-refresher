@@ -31,11 +31,26 @@ func cmdInfo(cCtx *cli.Context) error {
 }
 
 func showAccount(acc *AccountConfig) error {
-	slog.Debug("querying info", "account", acc.DisplayName)
+	slog.Debug("querying certs", "account", acc.DisplayName)
 	allCerts, err := qcdn.ListAllCerts(acc.qiniuCreds)
 	if err != nil {
 		slog.Error("failed to list certs", "account", acc.DisplayName, "err", err)
 		return err
+	}
+
+	// TODO: parallelize
+	domainsByCertID := make(map[string][]*qcdn.Domain)
+	for _, cert := range allCerts {
+		certID := cert.ID
+
+		slog.Debug("querying domains associated with cert", "account", acc.DisplayName, "certID", certID)
+		domains, err := qcdn.ListAllDomainsByCertID(acc.qiniuCreds, certID)
+		if err != nil {
+			slog.Error("failed to list domains", "account", acc.DisplayName, "certID", certID, "err", err)
+			return err
+		}
+
+		domainsByCertID[certID] = domains
 	}
 
 	fmt.Printf("# Account %s\n", acc.DisplayName)
@@ -51,6 +66,16 @@ func showAccount(acc *AccountConfig) error {
 			fmt.Println("  DNSNames:")
 			for _, n := range cert.DNSNames {
 				fmt.Printf("    - %s\n", n)
+			}
+		}
+
+		associatedDomains := domainsByCertID[cert.ID]
+		if len(associatedDomains) == 0 {
+			fmt.Println("  Domains: []")
+		} else {
+			fmt.Println("  Domains:")
+			for _, d := range associatedDomains {
+				fmt.Printf("    - %s\n", d.Name)
 			}
 		}
 	}
