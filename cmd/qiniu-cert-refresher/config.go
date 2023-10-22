@@ -11,8 +11,8 @@ import (
 	"github.com/BurntSushi/toml"
 )
 
-const defaultManagedCertNamePrefix = "[QLER-Managed]"
-const defaultConfigPath = "qler-config.toml"
+const defaultManagedCertNamePrefix = "[QCR-Managed]"
+const defaultConfigPath = "qcr-config.toml"
 
 type Config struct {
 	Accounts []*AccountConfig `toml:"accounts"`
@@ -31,7 +31,7 @@ type AccountConfig struct {
 }
 
 func configFromEnv() (*Config, error) {
-	numAccountsStr := os.Getenv("QLER_NUM_ACCOUNTS")
+	numAccountsStr := os.Getenv("QCR_NUM_ACCOUNTS")
 	if len(numAccountsStr) == 0 {
 		return nil, nil
 	}
@@ -80,7 +80,7 @@ func configFromTOML(path string) (*Config, error) {
 }
 
 func envKey(idx int, kind string) string {
-	return fmt.Sprintf("QLER_ACCOUNT_%d_%s", idx, kind)
+	return fmt.Sprintf("QCR_ACCOUNT_%d_%s", idx, kind)
 }
 
 func getenvForAccount(idx int, kind string) string {

@@ -1,4 +1,4 @@
-module github.com/xen0n/qiniu-letsencrypt-refresher
+module github.com/xen0n/qiniu-cert-refresher
 
 go 1.21.3
 
