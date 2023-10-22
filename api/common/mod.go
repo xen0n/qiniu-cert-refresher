@@ -5,46 +5,57 @@ package common
 import (
 	"bytes"
 	"encoding/json"
-	"io"
 	"net/http"
 
 	"github.com/qiniu/go-sdk/v7/auth"
 )
 
-const defaultHost = "https://api.qiniu.com"
-
 // RequestWithBody 带body对api发出请求并且返回response body
 //
 // copied and adapted from qiniu go-sdk (MIT-licensed)
-func RequestWithBody(mac *auth.Credentials, path string, body interface{}) ([]byte, error) {
-	reqData, err := json.Marshal(body)
-	if err != nil {
-		return nil, err
-	}
+func RequestWithBody[Resp any](mac *auth.Credentials, path string, body any) (Resp, error) {
+	var req *http.Request
+	var zeroResp Resp
+	if body != nil {
+		reqData, err := json.Marshal(body)
+		if err != nil {
+			return zeroResp, err
+		}
 
-	req, err := http.NewRequest("POST", path, bytes.NewReader(reqData))
-	if err != nil {
-		return nil, err
+		req, err = http.NewRequest(http.MethodPost, path, bytes.NewReader(reqData))
+		if err != nil {
+			return zeroResp, err
+		}
+	} else {
+		var err error
+		req, err = http.NewRequest(http.MethodGet, path, nil)
+		if err != nil {
+			return zeroResp, err
+		}
 	}
 
 	accessToken, err := mac.SignRequest(req)
 	if err != nil {
-		return nil, err
+		return zeroResp, err
 	}
 
 	req.Header.Add("Authorization", "QBox "+accessToken)
-	req.Header.Add("Content-Type", "application/json")
+	if body != nil {
+		req.Header.Add("Content-Type", "application/json")
+	}
 
 	resp, err := http.DefaultClient.Do(req)
 	if err != nil {
-		return nil, err
+		return zeroResp, err
 	}
 	defer resp.Body.Close()
 
-	data, err := io.ReadAll(resp.Body)
+	d := json.NewDecoder(resp.Body)
+	var result Resp
+	err = d.Decode(&result)
 	if err != nil {
-		return nil, err
+		return zeroResp, err
 	}
 
-	return data, nil
+	return result, nil
 }
