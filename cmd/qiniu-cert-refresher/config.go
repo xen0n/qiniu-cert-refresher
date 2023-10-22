@@ -10,6 +10,7 @@ import (
 	"strconv"
 
 	"github.com/BurntSushi/toml"
+	"github.com/qiniu/go-sdk/v7/auth"
 )
 
 const defaultManagedCertNamePrefix = "[QCR-Managed]"
@@ -30,19 +31,23 @@ type AccountConfig struct {
 	// ManagedCertNamePrefix 由本工具管理的证书名称的前缀，用于自动识别这部分证书记录与相关的域名
 	// 可以留空，意为取工具默认值
 	ManagedCertNamePrefix string `toml:"managed_cert_name_prefix"`
+
+	qiniuCreds *auth.Credentials
 }
 
 func defaultDisplayNameFromAK(ak string) string {
 	return fmt.Sprintf("%s***%s", ak[:3], ak[len(ak)-3:])
 }
 
-func (x *AccountConfig) fillDefaults() {
+func (x *AccountConfig) postinit() {
 	if x.DisplayName == "" {
 		x.DisplayName = defaultDisplayNameFromAK(x.AK)
 	}
 	if x.ManagedCertNamePrefix == "" {
 		x.ManagedCertNamePrefix = defaultManagedCertNamePrefix
 	}
+
+	x.qiniuCreds = auth.New(x.AK, x.SK)
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -78,7 +83,7 @@ func configFromTOML(path string) (*Config, error) {
 	}
 
 	for _, acc := range cfg.Accounts {
-		acc.fillDefaults()
+		acc.postinit()
 	}
 
 	return &cfg, nil
@@ -101,7 +106,7 @@ func configFromEnv() (*Config, error) {
 		if err != nil {
 			return nil, err
 		}
-		accCfg.fillDefaults()
+		accCfg.postinit()
 		accounts = append(accounts, accCfg)
 	}
 

@@ -40,6 +40,12 @@ func main() {
 		},
 		Commands: []*cli.Command{
 			{
+				Name:    "info",
+				Aliases: []string{"i"},
+				Usage:   "queries and shows the current state of configured accounts",
+				Action:  cmdInfo,
+			},
+			{
 				Name:    "upload",
 				Aliases: []string{"u"},
 				Usage:   "uploads a new certificate, refreshing all associated domains",
