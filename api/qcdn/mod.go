@@ -63,3 +63,12 @@ func listCerts(mac *auth.Credentials, marker string, limit int) (*RespListCerts,
 
 	return common.RequestWithBody[*RespListCerts](mac, sb.String(), nil)
 }
+
+func UploadCert(mac *auth.Credentials, req *ReqUploadCert) (id string, err error) {
+	resp, err := common.RequestWithBody[RespUploadCert](mac, defaultHost+"/sslcert", req)
+	if err != nil {
+		return "", err
+	}
+
+	return resp.ID, nil
+}

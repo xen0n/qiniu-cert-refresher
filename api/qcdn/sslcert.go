@@ -39,6 +39,10 @@ type ReqUploadCert struct {
 	CA string `json:"ca"`
 }
 
+type RespUploadCert struct {
+	ID string `json:"certid"`
+}
+
 type RespListCerts struct {
 	// Marker 用于标示下一次从哪个位置开始获取证书列表
 	Marker string  `json:"marker"`
