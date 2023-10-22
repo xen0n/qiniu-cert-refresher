@@ -1,3 +1,6 @@
+/qcr-config.toml
+/qiniu-cert-refresher
+
 # Created by https://www.toptal.com/developers/gitignore/api/go,linux,vim,visualstudiocode
 # Edit at https://www.toptal.com/developers/gitignore?templates=go,linux,vim,visualstudiocode
 

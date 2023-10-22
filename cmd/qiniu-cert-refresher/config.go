@@ -3,6 +3,7 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"io"
 	"os"
@@ -24,35 +25,39 @@ type AccountConfig struct {
 	// SK SecretKey
 	SK string `toml:"sk"`
 	// DisplayName 此账号的名称，仅用于日志、调试信息等显示用途
+	// 可以留空，该账号在展示时将仅体现 AK 的头尾几个字符
 	DisplayName string `toml:"display_name"`
 	// ManagedCertNamePrefix 由本工具管理的证书名称的前缀，用于自动识别这部分证书记录与相关的域名
 	// 可以留空，意为取工具默认值
 	ManagedCertNamePrefix string `toml:"managed_cert_name_prefix"`
 }
 
-func configFromEnv() (*Config, error) {
-	numAccountsStr := os.Getenv("QCR_NUM_ACCOUNTS")
-	if len(numAccountsStr) == 0 {
-		return nil, nil
-	}
-
-	numAccounts, err := strconv.ParseInt(numAccountsStr, 10, 0)
-	if err != nil {
-		return nil, err
-	}
-
-	var accounts []*AccountConfig
-	for i := 1; i <= int(numAccounts); i++ {
-		accCfg, err := accountConfigFromEnv(i)
-		if err != nil {
-			return nil, err
-		}
-		accCfg.fillDefaults()
-		accounts = append(accounts, accCfg)
-	}
-
-	return &Config{Accounts: accounts}, nil
+func defaultDisplayNameFromAK(ak string) string {
+	return fmt.Sprintf("%s***%s", ak[:3], ak[len(ak)-3:])
 }
+
+func (x *AccountConfig) fillDefaults() {
+	if x.DisplayName == "" {
+		x.DisplayName = defaultDisplayNameFromAK(x.AK)
+	}
+	if x.ManagedCertNamePrefix == "" {
+		x.ManagedCertNamePrefix = defaultManagedCertNamePrefix
+	}
+}
+
+//////////////////////////////////////////////////////////////////////////////
+
+type ctxConfigKey struct{}
+
+func setConfig(ctx context.Context, cfg *Config) context.Context {
+	return context.WithValue(ctx, ctxConfigKey{}, cfg)
+}
+
+func getConfig(ctx context.Context) *Config {
+	return ctx.Value(ctxConfigKey{}).(*Config)
+}
+
+//////////////////////////////////////////////////////////////////////////////
 
 func configFromTOML(path string) (*Config, error) {
 	f, err := os.Open(path)
@@ -77,6 +82,30 @@ func configFromTOML(path string) (*Config, error) {
 	}
 
 	return &cfg, nil
+}
+
+func configFromEnv() (*Config, error) {
+	numAccountsStr := os.Getenv("QCR_NUM_ACCOUNTS")
+	if len(numAccountsStr) == 0 {
+		return nil, nil
+	}
+
+	numAccounts, err := strconv.ParseInt(numAccountsStr, 10, 0)
+	if err != nil {
+		return nil, err
+	}
+
+	var accounts []*AccountConfig
+	for i := 1; i <= int(numAccounts); i++ {
+		accCfg, err := accountConfigFromEnv(i)
+		if err != nil {
+			return nil, err
+		}
+		accCfg.fillDefaults()
+		accounts = append(accounts, accCfg)
+	}
+
+	return &Config{Accounts: accounts}, nil
 }
 
 func envKey(idx int, kind string) string {
@@ -107,17 +136,4 @@ func accountConfigFromEnv(idx int) (*AccountConfig, error) {
 		DisplayName:           displayName,
 		ManagedCertNamePrefix: prefix,
 	}, nil
-}
-
-func defaultDisplayNameFromAK(ak string) string {
-	return fmt.Sprintf("%s***%s", ak[:3], ak[len(ak)-3:])
-}
-
-func (x *AccountConfig) fillDefaults() {
-	if x.DisplayName == "" {
-		x.DisplayName = defaultDisplayNameFromAK(x.AK)
-	}
-	if x.ManagedCertNamePrefix == "" {
-		x.ManagedCertNamePrefix = defaultManagedCertNamePrefix
-	}
 }
