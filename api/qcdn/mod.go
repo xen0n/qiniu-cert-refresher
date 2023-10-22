@@ -75,7 +75,10 @@ func listDomains(mac *auth.Credentials, req *ReqListDomains) (*RespListDomains, 
 		q.Set("limit", strconv.Itoa(req.Limit))
 	}
 
-	sb.WriteString(q.Encode())
+	if len(q) > 0 {
+		sb.WriteRune('?')
+		sb.WriteString(q.Encode())
+	}
 
 	return common.RequestWithBody[*RespListDomains](mac, sb.String(), nil)
 }
@@ -124,17 +127,14 @@ func listCerts(mac *auth.Credentials, marker string, limit int) (*RespListCerts,
 	sb.WriteString("/sslcert")
 
 	q := url.Values{}
-	hasQ := false
 	if len(marker) > 0 {
-		hasQ = true
 		q.Set("marker", marker)
 	}
 	if limit != defaultListCertsPageSize {
-		hasQ = true
 		q.Set("limit", strconv.Itoa(limit))
 	}
 
-	if hasQ {
+	if len(q) > 0 {
 		sb.WriteRune('?')
 		sb.WriteString(q.Encode())
 	}
