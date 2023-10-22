@@ -6,6 +6,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"io"
+	"log/slog"
 	"net/http"
 
 	"github.com/qiniu/go-sdk/v7/auth"
@@ -59,15 +60,22 @@ func RequestWithBody[Resp any](
 		req.Header.Add("Content-Type", "application/json")
 	}
 
+	slog.Debug("about to make HTTP call", "req", req)
 	resp, err := http.DefaultClient.Do(req)
 	if err != nil {
 		return zeroResp, err
 	}
 	defer resp.Body.Close()
 
-	d := json.NewDecoder(resp.Body)
+	respBody, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return zeroResp, err
+	}
+
+	slog.Debug("got HTTP response", "req", req, "statusCode", resp.StatusCode, "body", respBody)
+
 	var result Resp
-	err = d.Decode(&result)
+	err = json.Unmarshal(respBody, &result)
 	if err != nil {
 		return zeroResp, err
 	}
