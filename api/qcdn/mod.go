@@ -16,6 +16,83 @@ import (
 
 const defaultHost = "https://api.qiniu.com"
 
+///////////////////////////////////////////////////////////////////////////////
+
+func ListAllDomainsByCertID(mac *auth.Credentials, certID string) ([]*Domain, error) {
+	var result []*Domain
+
+	marker := ""
+	for {
+		req := ReqListDomains{
+			CertID: certID,
+			Marker: marker,
+		}
+		resp, err := listDomains(mac, &req)
+		if err != nil {
+			return nil, err
+		}
+
+		if len(resp.Domains) == 0 {
+			break
+		}
+
+		marker = resp.Marker
+		result = append(result, resp.Domains...)
+	}
+
+	return result, nil
+}
+
+func listDomains(mac *auth.Credentials, req *ReqListDomains) (*RespListDomains, error) {
+	var sb strings.Builder
+	sb.WriteString(defaultHost)
+	sb.WriteString("/domain")
+
+	q := url.Values{}
+	for _, t := range req.Types {
+		q.Add("types", string(t))
+	}
+	if len(req.CertID) > 0 {
+		q.Set("certid", req.CertID)
+	}
+	if len(req.SourceTypes) > 0 {
+		q["sourceTypes"] = req.SourceTypes
+	}
+	if len(req.SourceQiniuBucket) > 0 {
+		q.Set("sourceQiniuBucket", req.SourceQiniuBucket)
+	}
+	if len(req.SourceIP) > 0 {
+		q.Set("sourceIp", req.SourceIP)
+	}
+	if len(req.Marker) > 0 {
+		q.Set("marker", req.Marker)
+	}
+
+	if req.Limit < 1 || req.Limit > 1000 {
+		req.Limit = 10
+	}
+	if req.Limit != 10 {
+		q.Set("limit", strconv.Itoa(req.Limit))
+	}
+
+	sb.WriteString(q.Encode())
+
+	return common.RequestWithBody[*RespListDomains](mac, sb.String(), nil)
+}
+
+func UpdateHTTPSConfig(mac *auth.Credentials, domain string, newConf *HTTPSConfig) error {
+	var sb strings.Builder
+	sb.WriteString(defaultHost)
+	sb.WriteString("/domain/")
+	sb.WriteString(url.PathEscape(domain))
+	sb.WriteString("/httpsconf")
+
+	_, err := common.RequestWithBody[struct{}](mac, sb.String(), newConf, http.MethodPut)
+	return err
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
 const defaultListCertsPageSize = 100
 
 func ListAllCerts(mac *auth.Credentials) ([]*Cert, error) {
