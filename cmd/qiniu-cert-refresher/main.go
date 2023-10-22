@@ -46,11 +46,12 @@ func main() {
 				Action:  cmdInfo,
 			},
 			{
-				Name:    "upload",
-				Aliases: []string{"u"},
-				Usage:   "uploads a new certificate, refreshing all associated domains",
-				Before:  beforeCmd,
-				Action:  cmdUpload,
+				Name:      "upload",
+				Aliases:   []string{"u"},
+				Usage:     "uploads a new certificate, refreshing all associated domains",
+				ArgsUsage: "<TRACING-KEY-OF-THE-CERT>",
+				Before:    beforeCmd,
+				Action:    cmdUpload,
 				Flags: []cli.Flag{
 					&cli.PathFlag{
 						Name:  "cert",
