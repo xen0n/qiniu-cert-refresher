@@ -4,6 +4,7 @@ package qcdn
 
 import (
 	"log/slog"
+	"net/http"
 	"net/url"
 	"strconv"
 	"strings"
@@ -71,4 +72,14 @@ func UploadCert(mac *auth.Credentials, req *ReqUploadCert) (id string, err error
 	}
 
 	return resp.ID, nil
+}
+
+func DeleteCert(mac *auth.Credentials, id string) error {
+	var sb strings.Builder
+	sb.WriteString(defaultHost)
+	sb.WriteString("/sslcert/")
+	sb.WriteString(id)
+
+	_, err := common.RequestWithBody[struct{}](mac, sb.String(), nil, http.MethodDelete)
+	return err
 }
