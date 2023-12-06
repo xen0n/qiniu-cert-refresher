@@ -5,7 +5,7 @@ go 1.21
 require (
 	github.com/BurntSushi/toml v1.3.2
 	github.com/qiniu/go-sdk/v7 v7.18.2
-	github.com/samber/lo v1.38.1
+	github.com/samber/lo v1.39.0
 	github.com/urfave/cli/v2 v2.26.0
 	golang.org/x/sync v0.5.0
 )
