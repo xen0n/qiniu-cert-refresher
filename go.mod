@@ -6,7 +6,7 @@ require (
 	github.com/BurntSushi/toml v1.3.2
 	github.com/qiniu/go-sdk/v7 v7.19.0
 	github.com/samber/lo v1.39.0
-	github.com/urfave/cli/v2 v2.26.0
+	github.com/urfave/cli/v2 v2.27.1
 	golang.org/x/sync v0.5.0
 )
 
