@@ -3,7 +3,7 @@ module github.com/xen0n/qiniu-cert-refresher
 go 1.21
 
 require (
-	github.com/BurntSushi/toml v1.3.2
+	github.com/BurntSushi/toml v1.4.0
 	github.com/qiniu/go-sdk/v7 v7.21.0
 	github.com/samber/lo v1.39.0
 	github.com/urfave/cli/v2 v2.27.2
