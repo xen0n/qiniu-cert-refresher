@@ -1,6 +1,6 @@
 module github.com/xen0n/qiniu-cert-refresher
 
-go 1.21
+go 1.23
 
 require (
 	github.com/BurntSushi/toml v1.4.0
