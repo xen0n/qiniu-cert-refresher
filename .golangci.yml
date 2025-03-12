@@ -1,5 +1,4 @@
 run:
-  go: '1.21'
   modules-download-mode: readonly
 
 linters:
@@ -20,12 +19,8 @@ linters-settings:
       SPDX-License-Identifier: GPL-3.0-or-later
   goimports:
     local-prefixes: github.com/xen0n/qiniu-letsencrypt-refresher
-  gosimple:
-    go: '1.21'
   lll:
     line-length: 120
     tab-width: 4
   nakedret:
     max-func-lines: 1
-  stylecheck:
-    go: '1.21'
