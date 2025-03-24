@@ -5,7 +5,7 @@ go 1.23.0
 toolchain go1.24.0
 
 require (
-	github.com/BurntSushi/toml v1.4.0
+	github.com/BurntSushi/toml v1.5.0
 	github.com/qiniu/go-sdk/v7 v7.25.2
 	github.com/samber/lo v1.49.1
 	github.com/urfave/cli/v2 v2.27.6
