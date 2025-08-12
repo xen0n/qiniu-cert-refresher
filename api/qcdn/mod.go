@@ -11,7 +11,7 @@ import (
 
 	"github.com/qiniu/go-sdk/v7/auth"
 
-	"github.com/xen0n/qiniu-cert-refresher/api/common"
+	"github.com/xen0n/qiniu-cert-refresher/api/qiniucommon"
 )
 
 const defaultHost = "https://api.qiniu.com"
@@ -24,7 +24,7 @@ func GetDomain(mac *auth.Credentials, domain string) (*Domain, error) {
 	sb.WriteString("/domain/")
 	sb.WriteString(url.PathEscape(domain))
 
-	return common.RequestWithBody[*Domain](mac, sb.String(), nil)
+	return qiniucommon.RequestWithBody[*Domain](mac, sb.String(), nil)
 }
 
 func ListAllDomainsByCertID(mac *auth.Credentials, certID string) ([]*Domain, error) {
@@ -89,7 +89,7 @@ func listDomains(mac *auth.Credentials, req *ReqListDomains) (*RespListDomains, 
 		sb.WriteString(q.Encode())
 	}
 
-	return common.RequestWithBody[*RespListDomains](mac, sb.String(), nil)
+	return qiniucommon.RequestWithBody[*RespListDomains](mac, sb.String(), nil)
 }
 
 func UpdateHTTPSConfig(mac *auth.Credentials, domain string, newConf *HTTPSConfig) error {
@@ -99,7 +99,7 @@ func UpdateHTTPSConfig(mac *auth.Credentials, domain string, newConf *HTTPSConfi
 	sb.WriteString(url.PathEscape(domain))
 	sb.WriteString("/httpsconf")
 
-	_, err := common.RequestWithBody[struct{}](mac, sb.String(), newConf, http.MethodPut)
+	_, err := qiniucommon.RequestWithBody[struct{}](mac, sb.String(), newConf, http.MethodPut)
 	return err
 }
 
@@ -148,11 +148,11 @@ func listCerts(mac *auth.Credentials, marker string, limit int) (*RespListCerts,
 		sb.WriteString(q.Encode())
 	}
 
-	return common.RequestWithBody[*RespListCerts](mac, sb.String(), nil)
+	return qiniucommon.RequestWithBody[*RespListCerts](mac, sb.String(), nil)
 }
 
 func UploadCert(mac *auth.Credentials, req *ReqUploadCert) (id string, err error) {
-	resp, err := common.RequestWithBody[RespUploadCert](mac, defaultHost+"/sslcert", req)
+	resp, err := qiniucommon.RequestWithBody[RespUploadCert](mac, defaultHost+"/sslcert", req)
 	if err != nil {
 		return "", err
 	}
@@ -166,6 +166,6 @@ func DeleteCert(mac *auth.Credentials, id string) error {
 	sb.WriteString("/sslcert/")
 	sb.WriteString(id)
 
-	_, err := common.RequestWithBody[struct{}](mac, sb.String(), nil, http.MethodDelete)
+	_, err := qiniucommon.RequestWithBody[struct{}](mac, sb.String(), nil, http.MethodDelete)
 	return err
 }
