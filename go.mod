@@ -1,15 +1,13 @@
 module github.com/xen0n/qiniu-cert-refresher
 
-go 1.23.0
-
-toolchain go1.24.0
+go 1.24.0
 
 require (
 	github.com/BurntSushi/toml v1.5.0
 	github.com/qiniu/go-sdk/v7 v7.25.4
 	github.com/samber/lo v1.50.0
 	github.com/urfave/cli/v2 v2.27.6
-	golang.org/x/sync v0.15.0
+	golang.org/x/sync v0.17.0
 )
 
 require (
