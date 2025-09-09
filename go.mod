@@ -5,7 +5,7 @@ go 1.24.0
 require (
 	github.com/BurntSushi/toml v1.5.0
 	github.com/qiniu/go-sdk/v7 v7.25.4
-	github.com/samber/lo v1.50.0
+	github.com/samber/lo v1.51.0
 	github.com/urfave/cli/v2 v2.27.7
 	golang.org/x/sync v0.17.0
 )
