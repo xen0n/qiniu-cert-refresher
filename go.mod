@@ -7,7 +7,7 @@ require (
 	github.com/qiniu/go-sdk/v7 v7.26.13
 	github.com/samber/lo v1.53.0
 	github.com/urfave/cli/v2 v2.27.7
-	golang.org/x/sync v0.21.0
+	golang.org/x/sync v0.22.0
 )
 
 require (
